@@ -12,19 +12,24 @@ java {
 }
 
 repositories {
+	// nơi kéo những thư viện bên ngoài về
 	mavenCentral()
 }
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	//jpa giúp kết nối với database
+	//jpa giúp kết nối với database, ORM
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+	// mỗi khi trl s, dự án tự khởi động lại
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+	
+	// giúp chạy mysql
 	runtimeOnly("com.mysql:mysql-connector-j")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
