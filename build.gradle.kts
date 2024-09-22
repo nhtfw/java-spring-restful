@@ -28,7 +28,6 @@ dependencies {
 	// mỗi khi trl s, dự án tự khởi động lại
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-	
 	// giúp chạy mysql
 	runtimeOnly("com.mysql:mysql-connector-j")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
