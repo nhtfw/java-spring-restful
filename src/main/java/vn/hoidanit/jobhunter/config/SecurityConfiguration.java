@@ -26,6 +26,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers("/").permitAll()
@@ -33,6 +34,7 @@ public class SecurityConfiguration {
 
                 )
                 // config cho mô hình stateless, vì mặc định là stateful
+                .formLogin(f -> f.permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
