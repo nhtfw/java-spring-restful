@@ -4,14 +4,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.service.UserService;
+import vn.hoidanit.jobhunter.service.error.IdInvalidException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,7 +30,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/user")
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @PostMapping("/users")
     // RequestBody sẽ tự động mapping với JSON dựa vào biến (field) của JSON và đối
     // tượng User truyền vào
 
@@ -43,48 +49,59 @@ public class UserController {
      * nói dễ hiểu là để lấy dữ liệu của client truyền lên sv trước đó, cần tới
      * RequestBody
      */
-    public User createUser(@RequestBody User postmanUser) {
+    public ResponseEntity<User> createUser(@RequestBody User postmanUser) {
 
+        String encodedPassword = passwordEncoder.encode(postmanUser.getPassword());
+        postmanUser.setPassword(encodedPassword);
         User user = this.userService.handleCreateUser(postmanUser);
 
-        // chuyển object -> Json
-        return user;
+        // trả về 1 chuẩn response
+        // status : mã (lỗi) phản hồi
+        // body : dữ liệu phản hồi, vì generic là User, nên ta trả về user
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/users/{id}")
     // tự động ép kiểu từ string -> long
     // public String deleteUser(@PathVariable("id") long id) {
-    public String deleteUser(@PathVariable long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable long id) throws IdInvalidException {
+        if (id > 1500) {
+            // khi chương trình chạy vào đây, chương trình sẽ chạy tiếp vào
+            // handleIdException ở trong GlobalException, và tham số của handleIdException
+            // sẽ là
+            // IdInvalidException ở trong này
+            throw new IdInvalidException("Khong lon hon 1500");
+        }
 
         this.userService.handleDeleteUser(id);
 
-        return "delete";
+        // return ResponseEntity.status(HttpStatus.OK).body("Delete");
+        // status ok(body)
+        return ResponseEntity.ok("delete");
     }
 
-    @GetMapping("/user/{id}")
-    public User fetchUser(@PathVariable long id) {
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> fetchUser(@PathVariable long id) {
         User user = this.userService.fetchUserById(id);
-        if (user != null) {
-            return user;
-        }
-        return null;
+
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @GetMapping("/user")
-    public List<User> fetchAllUser() {
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> fetchAllUser() {
 
         List<User> users = this.userService.fetchAllUser();
 
-        return users;
+        return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     // cập nhật / patch cập nhật từng trường, put cập nhật cả object
-    @PutMapping("/user")
-    public User putMethodName(@RequestBody User newUser) {
+    @PutMapping("/users")
+    public ResponseEntity<User> putMethodName(@RequestBody User newUser) {
 
-        User currentUser = this.userService.fetchUserById(newUser.getId());
+        User currentUser = this.userService.handleUpdateUser(newUser);
 
-        return currentUser;
+        return ResponseEntity.status(HttpStatus.OK).body(currentUser);
     }
 
 }
