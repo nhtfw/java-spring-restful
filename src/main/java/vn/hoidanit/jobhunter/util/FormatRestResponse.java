@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
-import vn.hoidanit.jobhunter.domain.RestReponse;
+import vn.hoidanit.jobhunter.domain.RestResponse;
 
 // tùy chỉnh/can thiệp phản hồi của api
 @ControllerAdvice // generic là object vì chưa biết dữa liệu truyền là gì
@@ -31,11 +31,15 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
             ServerHttpRequest request,
             ServerHttpResponse response) {
 
-        // gán ServerHttpResponse sang ServletServerHttpResponse
+        // gán ServerHttpResponse sang ServletServerHttpResponse để lấy mã lỗi
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
 
-        RestReponse<Object> res = new RestReponse<Object>();
+        RestResponse<Object> res = new RestResponse<Object>();
+
+        if (body instanceof String) {
+            return body;
+        }
 
         res.setStatusCode(status);
 

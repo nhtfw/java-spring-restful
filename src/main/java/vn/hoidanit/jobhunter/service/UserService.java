@@ -48,4 +48,8 @@ public class UserService {
     public List<User> fetchAllUser() {
         return this.userRepository.findAll();
     }
+
+    public User handleGetUserByUsername(String username) {
+        return this.userRepository.findByEmail(username);
+    }
 }

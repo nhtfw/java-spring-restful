@@ -1,11 +1,11 @@
 package vn.hoidanit.jobhunter.domain;
 
-public class RestReponse<T> {
+public class RestResponse<T> {
 
     private int statusCode;
     private String error;
 
-    // message có thể là String hoặc ArrayList
+    // message có thể là String hoặc ArrayList, nghĩa là sẽ có 1 lỗi hoặc nhiều lỗi
     private Object message;
     private T data;
 
