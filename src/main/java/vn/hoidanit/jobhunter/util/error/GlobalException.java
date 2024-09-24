@@ -2,7 +2,6 @@ package vn.hoidanit.jobhunter.util.error;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,17 +27,19 @@ public class GlobalException {
     // muốn lắng nghe exception nào xảy ra, truyền vào exception đấy
     // @ExceptionHandler(value = IdInvalidException.class)
     @ExceptionHandler(value = {
-            IdInvalidException.class,
             UsernameNotFoundException.class,
-            //
+            // nếu BadCredentialsException không chạy vào đây, có thể bạn chưa cấu hình jwt
+            // lỗi thông tin đăng nhập sai (username/password)
             BadCredentialsException.class
     })
-    public ResponseEntity<RestResponse<Object>> handleIdException(IdInvalidException idInvalidException) {
+    // vì handle 2 exception khác nhau, nên dùng class cha của 2 ex ở trên là
+    // Exception
+    public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
 
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError("IdInvalidException");
-        res.setMessage(idInvalidException.getMessage());
+        res.setError(ex.getMessage());
+        res.setMessage("Exception occurs ...");
 
         // status.body, class này chạy trước FormatRestResponse
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);

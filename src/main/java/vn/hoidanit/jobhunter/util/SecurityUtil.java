@@ -44,14 +44,15 @@ public class SecurityUtil {
          * .expiresAt(validity): Thời gian token hết hạn.
          * .subject(authentication.getName()): subject là thông tin định danh chính
          * (thường là username hoặc ID người dùng).
-         * .claim("hoidanit", authentication): Bạn thêm một custom claim với tên
-         * "hoidanit", chứa thông tin xác thực (authentication)
+         * .claim("claim_name", authentication): Bạn thêm một custom claim với tên
+         * "claim_name", chứa thông tin xác thực (authentication)
          */
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                .claim("hoidanit", authentication)
+                //
+                .claim("claim_name", authentication)
                 .build();
 
         // Header: Chứa thông tin về loại token và thuật toán mã hóa.
