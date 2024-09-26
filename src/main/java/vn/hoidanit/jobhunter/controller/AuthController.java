@@ -46,7 +46,7 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // create a token
-        // truyền vào thông tin đăng nhập của người dùng
+        // truyền vào thông tin đăng nhập của người dùng để lấy token
         String accessToken = this.securityUtil.createToken(authentication);
 
         // lưu thông tin vào context

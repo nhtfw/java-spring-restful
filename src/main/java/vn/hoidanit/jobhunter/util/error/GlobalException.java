@@ -46,7 +46,9 @@ public class GlobalException {
     }
 
     // handle lỗi không nhập username và password (để trống)
+    // handle lỗi validate dữ liệu (dữ liệu để trống,...)
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    // truyền generic là object vì data == null
     public ResponseEntity<RestResponse<Object>> validationError(MethodArgumentNotValidException ex) {
         // lấy message lỗi
         BindingResult result = ex.getBindingResult();

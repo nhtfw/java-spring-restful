@@ -2,6 +2,8 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.2.4"
 	id("io.spring.dependency-management") version "1.1.4"
+	// cài đặt thư viện của lombok(thay thế getter và setter)
+	id("io.freefair.lombok") version "8.6"
 }
 
 group = "vn.hoidanit"
