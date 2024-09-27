@@ -2,14 +2,18 @@ package vn.hoidanit.jobhunter.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.turkraft.springfilter.boot.Filter;
+
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.UserService;
+import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -94,22 +98,36 @@ public class UserController {
     }
 
     @GetMapping("/users")
+    @ApiMessage(value = "fetch all users")
     public ResponseEntity<ResultPaginationDTO> fetchAllUser(
-            @RequestParam("current") Optional<String> currentOptional,
-            @RequestParam("pageSize") Optional<String> pageSizeOptional) {
+            /*
+             * Để sử dụng spring filter, ta thêm @Filter
+             * Trong querry string thêm vào param "filter"
+             */
+            @Filter Specification<User> spec,
+            /*
+             * tự động lấy param từ querry string là page và size, page là số trang hiện
+             * tại, size là số phần tử của mỗi trang
+             * 
+             * Có thể sort bằng cách thêm param sort
+             */
+            Pageable pageable
+    // @RequestParam(value = "current", defaultValue = "1") Optional<String>
+    // currentOptional,
+    // @RequestParam(value = "pageSize", defaultValue = "2") Optional<String>
+    // pageSizeOptional
+    ) {
 
-        String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
-        String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
+        // String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
+        // String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() :
+        // "";
 
-        int current = Integer.parseInt(sCurrent);
-        int pageSize = Integer.parseInt(sPageSize);
+        // int current = Integer.parseInt(sCurrent);
+        // int pageSize = Integer.parseInt(sPageSize);
 
-        // lấy từ trang 0 nên trừ 1
-        Pageable pageable = PageRequest.of(current - 1, pageSize);
-
-        // List<User> users = this.userService.fetchAllUser(pageable);
-
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(pageable));
+        // // lấy từ trang 0 nên trừ 1
+        // Pageable pageable = PageRequest.of(current - 1, pageSize);
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(spec, pageable));
     }
 
     // cập nhật / patch cập nhật từng trường, put cập nhật cả object

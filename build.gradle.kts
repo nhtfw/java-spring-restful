@@ -35,6 +35,9 @@ dependencies {
 	runtimeOnly("com.mysql:mysql-connector-j")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+
+    // specification
+	implementation("com.turkraft.springfilter:jpa:3.1.7")
 }
 
 tasks.withType<Test> {

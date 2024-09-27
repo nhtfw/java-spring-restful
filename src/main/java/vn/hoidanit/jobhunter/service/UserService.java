@@ -3,6 +3,7 @@ package vn.hoidanit.jobhunter.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
@@ -60,9 +61,42 @@ public class UserService {
         Meta meta = new Meta();
 
         // số trang hiện tại
-        meta.setPage(page.getNumber());
+        meta.setPage(page.getNumber() + 1);
         // số phần tử mỗi trang
         meta.setPageSize(page.getSize());
+        // tổng số trang
+        meta.setPages(page.getTotalPages());
+        // tổng số phần tử
+        meta.setTotal(page.getTotalElements());
+
+        rs.setMeta(meta);
+        rs.setResult(page.getContent());
+
+        return rs;
+    }
+
+    public ResultPaginationDTO fetchAllUser(Specification<User> spec) {
+        List<User> users = this.userRepository.findAll(spec);
+
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        Meta meta = new Meta();
+
+        rs.setMeta(meta);
+        rs.setResult(users);
+
+        return rs;
+    }
+
+    public ResultPaginationDTO fetchAllUser(Specification<User> spec, Pageable pageable) {
+        Page<User> page = this.userRepository.findAll(spec, pageable);
+
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        Meta meta = new Meta();
+
+        // số trang hiện tại
+        meta.setPage(pageable.getPageNumber() + 1);
+        // số phần tử mỗi trang
+        meta.setPageSize(pageable.getPageSize());
         // tổng số trang
         meta.setPages(page.getTotalPages());
         // tổng số phần tử

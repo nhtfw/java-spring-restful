@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
 import vn.hoidanit.jobhunter.domain.RestResponse;
+import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 
 // tùy chỉnh/can thiệp phản hồi của api
 @ControllerAdvice // generic là object vì chưa biết dữa liệu truyền là gì
@@ -52,7 +53,9 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
         } else {
             // case success
             res.setData(body);
-            res.setMessage("CALL API SUCCESS");
+            // lấy annotation
+            ApiMessage message = returnType.getMethodAnnotation(ApiMessage.class);
+            res.setMessage(message == null ? "CALL API SUCCESS" : message.value());
         }
 
         // trả về đối tượng RestResponse và data(body) là một đối tượng nào đó

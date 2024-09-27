@@ -2,6 +2,8 @@ package vn.hoidanit.jobhunter.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.turkraft.springfilter.boot.Filter;
+
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
@@ -14,6 +16,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,22 +44,26 @@ public class CompanyController {
 
     @GetMapping("/companies")
     public ResponseEntity<ResultPaginationDTO> getAllCompanies(
-            @RequestParam("current") Optional<String> currentOptional,
-            @RequestParam("pageSize") Optional<String> pageSizeOptional) {
+            @Filter Specification<Company> spec,
+            Pageable pageable
+    // @RequestParam("current") Optional<String> currentOptional,
+    // @RequestParam("pageSize") Optional<String> pageSizeOptional
+    ) {
 
-        String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
-        String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
+        // String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
+        // String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() :
+        // "";
 
-        int current = Integer.parseInt(sCurrent);
-        int pageSize = Integer.parseInt(sPageSize);
+        // int current = Integer.parseInt(sCurrent);
+        // int pageSize = Integer.parseInt(sPageSize);
 
         // lấy từ trang 0 nên trừ 1
-        Pageable pageable = PageRequest.of(current - 1, pageSize);
+        // Pageable pageable = PageRequest.of(current - 1, pageSize);
 
         // List<Company> companies = this.companyService.fetchAllCompanies();
 
         // status ok, body companies
-        return ResponseEntity.ok(this.companyService.fetchAllCompanies(pageable));
+        return ResponseEntity.ok(this.companyService.fetchAllCompanies(spec, pageable));
     }
 
     @PutMapping("/companies")
