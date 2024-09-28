@@ -8,7 +8,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-// cấu hình cho cors filter
+// cấu hình cho cors filter security
 @Configuration
 public class CorsConfig {
 

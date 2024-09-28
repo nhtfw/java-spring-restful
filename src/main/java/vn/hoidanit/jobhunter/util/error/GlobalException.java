@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import vn.hoidanit.jobhunter.domain.RestResponse;
 
@@ -30,7 +31,8 @@ public class GlobalException {
             UsernameNotFoundException.class,
             // nếu BadCredentialsException không chạy vào đây, có thể bạn chưa cấu hình jwt
             // lỗi thông tin đăng nhập sai (username/password)
-            BadCredentialsException.class
+            BadCredentialsException.class,
+            IdInvalidException.class
     })
     // vì handle 2 exception khác nhau, nên dùng class cha của 2 ex ở trên là
     // Exception
@@ -72,4 +74,41 @@ public class GlobalException {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
+
+    @ExceptionHandler(EmailDuplicateException.class)
+    public ResponseEntity<RestResponse<Object>> emailDuplicateException(EmailDuplicateException ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError("Email duplicate");
+        res.setMessage(ex.getMessage());
+
+        // status.body, class này chạy trước FormatRestResponse
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<RestResponse<Object>> noResourceException(NoResourceFoundException ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Đường link không tồn tại");
+
+        // status.body, class này chạy trước FormatRestResponse
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<RestResponse<Object>> nullPointException(NullPointerException ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Filter sai cú pháp");
+
+        // status.body, class này chạy trước FormatRestResponse
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
 }

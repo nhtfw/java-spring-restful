@@ -4,38 +4,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.dto.ResUpdateUserDTO;
+import vn.hoidanit.jobhunter.domain.dto.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.Meta;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.dto.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepository userRepository;
 
     public User handleCreateUser(User user) {
-        return this.userRepository.save(user);
+        if (!this.isEmailExist(user.getEmail())) {
+            user = this.userRepository.save(user);
+
+            return user;
+        }
+        return null;
     };
 
     public User handleUpdateUser(User newUser) {
-        User currentUser = this.fetchUserById(newUser.getId());
+        User user = this.userRepository.findTop1ById(newUser.getId());
         // vì đã có id nên thay vì create, chương trình sẽ update
-        if (currentUser != null) {
+        if (user != null) {
 
-            currentUser.setName(newUser.getName());
-            currentUser.setEmail(newUser.getEmail());
-            currentUser.setPassword(newUser.getPassword());
+            user.setName(newUser.getName());
+            user.setGender(newUser.getGender());
+            user.setAddress(newUser.getAddress());
+            user.setAge(newUser.getAge());
 
-            currentUser = this.userRepository.save(currentUser);
+            return this.userRepository.save(user);
+
         }
-
-        return currentUser;
+        return null;
     }
 
     public void handleDeleteUser(long id) {
@@ -43,11 +54,12 @@ public class UserService {
     }
 
     public User fetchUserById(long id) {
-        Optional<User> userOptional = this.userRepository.findById(id);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
+        Optional<User> user = this.userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            return null;
         }
-        return null;
     }
 
     public List<User> fetchAllUser() {
@@ -103,7 +115,23 @@ public class UserService {
         meta.setTotal(page.getTotalElements());
 
         rs.setMeta(meta);
-        rs.setResult(page.getContent());
+
+        List<ResUserDTO> users = new ArrayList<ResUserDTO>();
+        for (User user : page.getContent()) {
+            ResUserDTO ru = new ResUserDTO();
+
+            ru.setId(user.getId());
+            ru.setName(user.getName());
+            ru.setEmail(user.getEmail());
+            ru.setGender(user.getGender());
+            ru.setAddress(user.getAddress());
+            ru.setAge(user.getAge());
+            ru.setCreateAt(user.getCreatedAt());
+            ru.setUpdatedAt(user.getUpdatedAt());
+
+            users.add(ru);
+        }
+        rs.setResult(users);
 
         return rs;
     }
@@ -111,4 +139,51 @@ public class UserService {
     public User handleGetUserByUsername(String username) {
         return this.userRepository.findByEmail(username);
     }
+
+    public boolean isEmailExist(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
+
+    public ResCreateUserDTO convertToResCreateUserDTO(User user) {
+        ResCreateUserDTO ru = new ResCreateUserDTO();
+
+        ru.setId(user.getId());
+        ru.setName(user.getName());
+        ru.setEmail(user.getEmail());
+        ru.setGender(user.getGender());
+        ru.setAddress(user.getAddress());
+        ru.setAge(user.getAge());
+        ru.setCreatedAt(user.getCreatedAt());
+
+        return ru;
+    }
+
+    public ResUserDTO convertToResUserDTO(User user) {
+        ResUserDTO ru = new ResUserDTO();
+
+        ru.setId(user.getId());
+        ru.setName(user.getName());
+        ru.setEmail(user.getEmail());
+        ru.setGender(user.getGender());
+        ru.setAddress(user.getAddress());
+        ru.setAge(user.getAge());
+        ru.setCreateAt(user.getCreatedAt());
+        ru.setUpdatedAt(user.getUpdatedAt());
+
+        return ru;
+    }
+
+    public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
+        ResUpdateUserDTO ru = new ResUpdateUserDTO();
+
+        ru.setId(user.getId());
+        ru.setName(user.getName());
+        ru.setGender(user.getGender());
+        ru.setAddress(user.getAddress());
+        ru.setAge(user.getAge());
+        ru.setUpdatedAt(user.getUpdatedAt());
+
+        return ru;
+    }
+
 }

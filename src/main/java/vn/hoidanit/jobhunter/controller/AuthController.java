@@ -15,8 +15,10 @@ import vn.hoidanit.jobhunter.util.SecurityUtil;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController // chuyển thành api
+@RequestMapping("/api/v1")
 public class AuthController {
 
     @Autowired

@@ -5,8 +5,10 @@ public class RestResponse<T> {
     private int statusCode;
     private String error;
 
-    // message có thể là String hoặc ArrayList, nghĩa là sẽ có 1 lỗi hoặc nhiều lỗi
+    // message có thể là String hoặc ArrayList<String>, nghĩa là sẽ có 1 lỗi hoặc
+    // nhiều lỗi
     private Object message;
+
     private T data;
 
     public int getStatusCode() {
