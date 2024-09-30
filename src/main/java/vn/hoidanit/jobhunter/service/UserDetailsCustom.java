@@ -25,6 +25,7 @@ public class UserDetailsCustom implements UserDetailsService {
             throw new UsernameNotFoundException("Username/Password không hợp lệ");
         }
 
+        // nếu muốn lưu thêm data của user như avatar,... thì phải kế thừa UserDetails
         return new User(
                 user.getEmail(),
                 user.getPassword(),

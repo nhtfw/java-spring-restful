@@ -186,4 +186,12 @@ public class UserService {
         return ru;
     }
 
+    public void updateUserToken(String token, String email) {
+        User user = this.handleGetUserByUsername(email);
+        if (user != null) {
+            user.setRefreshToken(token);
+            this.userRepository.save(user);
+        }
+    }
+
 }

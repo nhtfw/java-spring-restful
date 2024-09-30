@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +17,8 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+
+import vn.hoidanit.jobhunter.domain.dto.ResLoginDTO;
 
 // làm việc với jwt
 @Service
@@ -32,24 +33,27 @@ public class SecurityUtil {
     @Value("${hoidanit.jwt.base64-secret}")
     private String jwtKey;
 
-    @Value("${hoidanit.jwt.token-validity-in-seconds}")
-    private long jwtExpiration;
+    @Value("${hoidanit.jwt.access-token-validity-in-seconds}")
+    private long accessTokenExpiration;
+
+    @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
 
     @Autowired
     private JwtEncoder jwtEncoder;
 
-    public String createToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, ResLoginDTO.UserLogin dto) {
         // mốc thời gian hiện tại + thời hạn hết hạn của token
         Instant now = Instant.now();
-        Instant validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         // Payload: Chứa dữ liệu về người dùng hoặc các claims (yêu cầu) khác
         // tạo payload cho jwt
         /*
          * .issuedAt(now): Thời gian phát hành token.
          * .expiresAt(validity): Thời gian token hết hạn.
-         * .subject(authentication.getName()): subject là thông tin định danh chính
-         * (thường là username hoặc ID người dùng).
+         * .subject(authentication.getName()): subject là thông tin định danh người dùng
+         * chính (thường là username hoặc ID người dùng).
          * .claim("claim_name", authentication): Bạn thêm một custom claim với tên
          * "claim_name", chứa thông tin xác thực (authentication)
          */
@@ -57,8 +61,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                //
-                .claim("claim_name", authentication)
+                .claim("user", dto)
                 .build();
 
         // Header: Chứa thông tin về loại token và thuật toán mã hóa.
@@ -74,6 +77,32 @@ public class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
+    /*
+     * Access Token có thời gian sống ngắn để đảm bảo bảo mật.
+     * Refresh Token có thời gian sống dài hơn và được sử dụng để tạo mới Access
+     * Token khi hết hạn, giúp duy trì phiên đăng nhập lâu dài mà không cần phải
+     * đăng nhập lại thường xuyên.
+     * Việc sử dụng cả Access Token và Refresh Token giúp cân bằng giữa bảo mật và
+     * trải nghiệm người dùng.
+     */
+    public String createRefreshToken(String email, ResLoginDTO res) {
+        // mốc thời gian hiện tại + thời hạn hết hạn của token
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                //
+                .claim("user", res.getUser())
+                .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
     /**
      * Get the login of the current user.
      *
@@ -83,6 +112,15 @@ public class SecurityUtil {
         // lấy tên đăng nhập/email của user đang đăng nhập từ context
         SecurityContext securityContext = SecurityContextHolder.getContext();
         // trả về authentication đã lưu trước đó khi đăng nhập thành công trong context
+        /*
+         * extractPrincipal, Phương thức này (giả định) trích xuất thông tin Principal
+         * từ Authentication. Principal thường là username hoặc email của người dùng,
+         * tùy thuộc vào cấu hình.
+         * 
+         * Hàm này chỉ trả về username hoặc email thay vì trả về toàn bộ Authentication
+         * để tránh lộ thông tin nhạy cảm như mật khẩu hoặc chi tiết bảo mật không cần
+         * thiết khác.
+         */
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
 
@@ -113,58 +151,4 @@ public class SecurityUtil {
                 .filter(authentication -> authentication.getCredentials() instanceof String)
                 .map(authentication -> (String) authentication.getCredentials());
     }
-
-    /**
-     * Check if a user is authenticated.
-     *
-     * @return true if the user is authenticated, false otherwise.
-     */
-    // public static boolean isAuthenticated() {
-    // Authentication authentication =
-    // SecurityContextHolder.getContext().getAuthentication();
-    // return authentication != null
-    // &&
-    // getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
-    // }
-
-    /**
-     * Checks if the current user has any of the authorities.
-     *
-     * @param authorities the authorities to check.
-     * @return true if the current user has any of the authorities, false otherwise.
-     */
-    // public static boolean hasCurrentUserAnyOfAuthorities(String... authorities) {
-    // Authentication authentication =
-    // SecurityContextHolder.getContext().getAuthentication();
-    // return (authentication != null && getAuthorities(authentication)
-    // .anyMatch(authority -> Arrays.asList(authorities).contains(authority)));
-    // }
-
-    /**
-     * Checks if the current user has none of the authorities.
-     *
-     * @param authorities the authorities to check.
-     * @return true if the current user has none of the authorities, false
-     *         otherwise.
-     */
-    // public static boolean hasCurrentUserNoneOfAuthorities(String... authorities)
-    // {
-    // return !hasCurrentUserAnyOfAuthorities(authorities);
-    // }
-
-    /**
-     * Checks if the current user has a specific authority.
-     *
-     * @param authority the authority to check.
-     * @return true if the current user has the authority, false otherwise.
-     */
-    // public static boolean hasCurrentUserThisAuthority(String authority) {
-    // return hasCurrentUserAnyOfAuthorities(authority);
-    // }
-
-    // private static Stream<String> getAuthorities(Authentication authentication) {
-    // return
-    // authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
-    // }
-
 }
