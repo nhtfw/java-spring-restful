@@ -2,7 +2,12 @@ package vn.hoidanit.jobhunter.util;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +21,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
+
+import com.nimbusds.jose.util.Base64;
 
 import vn.hoidanit.jobhunter.domain.dto.ResLoginDTO;
 
@@ -47,8 +55,13 @@ public class SecurityUtil {
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
-        // Payload: Chứa dữ liệu về người dùng hoặc các claims (yêu cầu) khác
+        // hardcode permission
+        List<String> listAuthority = new ArrayList<String>();
+        listAuthority.add("ROLE_USER_CREATE");
+        listAuthority.add("ROLE_USER_UPDATE");
+
         // tạo payload cho jwt
+        // Payload: Chứa dữ liệu về người dùng hoặc các claims (yêu cầu) khác
         /*
          * .issuedAt(now): Thời gian phát hành token.
          * .expiresAt(validity): Thời gian token hết hạn.
@@ -62,6 +75,50 @@ public class SecurityUtil {
                 .expiresAt(validity)
                 .subject(authentication.getName())
                 .claim("user", dto)
+                // thêm 1 claim có tên permisson
+                .claim("permission", listAuthority)
+                .build();
+
+        // Header: Chứa thông tin về loại token và thuật toán mã hóa.
+        // tạo header cho jwt
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+
+        /*
+         * Phần signature của JWT được thêm vào trong quá trình mã hóa của JwtEncoder.
+         * Mặc dù đoạn code bạn chia sẻ không trực tiếp hiển thị việc thêm signature,
+         * nhưng nó diễn ra tự động khi JwtEncoder thực hiện mã hóa JWT với thuật toán
+         * HMAC-SHA512 (HS512).
+         */
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public String createAccessToken(String email, ResLoginDTO.UserLogin dto) {
+        // mốc thời gian hiện tại + thời hạn hết hạn của token
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
+
+        // hardcode permission
+        List<String> listAuthority = new ArrayList<String>();
+        listAuthority.add("ROLE_USER_CREATE");
+        listAuthority.add("ROLE_USER_UPDATE");
+
+        // tạo payload cho jwt
+        // Payload: Chứa dữ liệu về người dùng hoặc các claims (yêu cầu) khác
+        /*
+         * .issuedAt(now): Thời gian phát hành token.
+         * .expiresAt(validity): Thời gian token hết hạn.
+         * .subject(authentication.getName()): subject là thông tin định danh người dùng
+         * chính (thường là username hoặc ID người dùng).
+         * .claim("claim_name", authentication): Bạn thêm một custom claim với tên
+         * "claim_name", chứa thông tin xác thực (authentication)
+         */
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .claim("user", dto)
+                // thêm 1 claim có tên permisson
+                .claim("permission", listAuthority)
                 .build();
 
         // Header: Chứa thông tin về loại token và thuật toán mã hóa.
@@ -101,6 +158,40 @@ public class SecurityUtil {
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
 
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    // hàm lấy key, key được lấy từ file môi trường (applications.property)
+    private SecretKey getSecretKey() {
+        /*
+         * jwtKey là một chuỗi đã mã hóa Base64. Phương thức này dùng để giải mã chuỗi
+         * này thành mảng byte để tạo ra một đối tượng SecretKey
+         * 
+         * Base64.from(jwtKey).decode(): Giải mã chuỗi jwtKey từ dạng Base64 thành mảng
+         * byte.
+         */
+        byte[] keyBytes = Base64.from(jwtKey).decode();
+
+        /*
+         * SecretKeySpec: Đây là một lớp dùng để tạo đối tượng SecretKey từ mảng byte.
+         * Bạn cần đối tượng này để sử dụng làm khóa bí mật cho thuật toán mã hóa của
+         * JWT
+         * 
+         * SecurityUtil.JWT_ALGORITHM.getName() trả về tên của thuật toán mã hóa
+         */
+        return new SecretKeySpec(keyBytes, 0, keyBytes.length, JWT_ALGORITHM.getName());
+    }
+
+    public Jwt checkValidRefreshToken(String token) {
+        // lấy ra key
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
+                getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
+        try {
+            // giải mã token, nếu có lỗi trả về lỗi
+            return jwtDecoder.decode(token);
+        } catch (Exception e) {
+            System.out.println(">>> Refresh token error: " + e.getMessage());
+            throw e;
+        }
     }
 
     /**

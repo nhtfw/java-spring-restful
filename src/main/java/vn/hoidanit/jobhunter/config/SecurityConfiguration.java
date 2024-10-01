@@ -89,13 +89,21 @@ public class SecurityConfiguration {
 
     // khi decode-giải mã thành công
     @Bean
-    // lấy data của jwt vào authentication, lưu authentication vào spring
+    // lấy data của jwt nạp vào authentication, lưu authentication vào spring
     // security context
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("user");
+        // ứng với claim có tên permission, nạp tất cả data của claim đó nạp vào
+        // authentication
+        /*
+         * Thiết lập tên của claim trong JWT mà Spring Security sẽ dùng để lấy danh sách
+         * các quyền hạn. Ở đây, bạn đã chỉ định là "permission", tức là Spring Security
+         * sẽ lấy giá trị từ claim "permission" trong JWT để xác định các quyền hạn của
+         * người dùng.
+         */
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
@@ -125,12 +133,13 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/", "/api/v1/auth/login").permitAll()
+                                .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
                                 .anyRequest().authenticated())
 
                 // cấu hình jwt
                 .oauth2ResourceServer((oauth2) -> oauth2
-                        // tự động thêm BearerTokenAuthenticationFilter
+                        // tự động thêm BearerTokenAuthenticationFilter, nghĩa là khi truy cập api cần
+                        // jwt(trừ permitall)
                         .jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint)) // 401, không truyền, truyền sai lên
                                                                                    // token

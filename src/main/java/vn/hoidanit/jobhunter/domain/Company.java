@@ -43,10 +43,10 @@ public class Company {
      * 00:00:00 UTC ngày 1 tháng 1 năm 1970).
      */
     // format sang múi giờ +7 cho frontend, backend vẫn lưu +0
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdAt;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;
 
     private String createdBy;
