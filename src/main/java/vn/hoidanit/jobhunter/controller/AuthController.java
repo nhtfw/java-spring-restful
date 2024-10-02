@@ -204,10 +204,11 @@ public class AuthController {
 
                 String email = emailOp.isPresent() ? emailOp.get() : "";
 
-                this.userService.updateUserToken("", email);
+                this.userService.updateUserToken(null, email);
 
                 // xóa cookie bằng cách cấu hình trùng nhau nhưng maxage = 0;
-                ResponseCookie responseCookie = ResponseCookie.from("refresh_token", null)
+                ResponseCookie responseCookie = ResponseCookie
+                                .from("refresh_token", null)
                                 .httpOnly(true)
                                 .secure(true)
                                 .path("/")
