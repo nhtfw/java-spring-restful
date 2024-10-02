@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import vn.hoidanit.jobhunter.domain.dto.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.dto.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.Meta;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.dto.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
@@ -70,7 +69,7 @@ public class UserService {
         Page<User> page = this.userRepository.findAll(pageable);
 
         ResultPaginationDTO rs = new ResultPaginationDTO();
-        Meta meta = new Meta();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
         // số trang hiện tại
         meta.setPage(page.getNumber() + 1);
@@ -91,7 +90,7 @@ public class UserService {
         List<User> users = this.userRepository.findAll(spec);
 
         ResultPaginationDTO rs = new ResultPaginationDTO();
-        Meta meta = new Meta();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
         rs.setMeta(meta);
         rs.setResult(users);
@@ -103,7 +102,7 @@ public class UserService {
         Page<User> page = this.userRepository.findAll(spec, pageable);
 
         ResultPaginationDTO rs = new ResultPaginationDTO();
-        Meta meta = new Meta();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
         // số trang hiện tại
         meta.setPage(pageable.getPageNumber() + 1);
