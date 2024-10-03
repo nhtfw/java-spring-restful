@@ -147,7 +147,7 @@ public class UserController {
     // cập nhật / patch cập nhật từng trường, put cập nhật cả object
     @PutMapping("/users")
     @ApiMessage("update a user")
-    public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody ReqUpdateUserDTO newUser)
+    public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User newUser)
             throws IdInvalidException {
 
         User currentUser = this.userService.handleUpdateUser(newUser);

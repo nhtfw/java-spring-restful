@@ -36,7 +36,7 @@ public class UserService {
         return this.userRepository.save(user);
     };
 
-    public User handleUpdateUser(ReqUpdateUserDTO newUser) {
+    public User handleUpdateUser(User newUser) {
         User user = this.userRepository.findTop1ById(newUser.getId());
         // vì đã có id nên thay vì create, chương trình sẽ update
         if (user != null) {
