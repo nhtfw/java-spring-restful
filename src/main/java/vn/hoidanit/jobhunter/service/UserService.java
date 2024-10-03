@@ -4,10 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.request.ReqUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
@@ -23,16 +24,19 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User handleCreateUser(User user) {
-        if (!this.isEmailExist(user.getEmail())) {
-            user = this.userRepository.save(user);
+    @Autowired
+    private CompanyService companyService;
 
-            return user;
+    public User handleCreateUser(User user) {
+        // check company
+        if (user.getCompany() != null) {
+            Optional<Company> comOptional = this.companyService.fetchCompanyById(user.getCompany().getId());
+            user.setCompany(comOptional.isPresent() ? comOptional.get() : null);
         }
-        return null;
+        return this.userRepository.save(user);
     };
 
-    public User handleUpdateUser(User newUser) {
+    public User handleUpdateUser(ReqUpdateUserDTO newUser) {
         User user = this.userRepository.findTop1ById(newUser.getId());
         // vì đã có id nên thay vì create, chương trình sẽ update
         if (user != null) {
@@ -42,8 +46,13 @@ public class UserService {
             user.setAddress(newUser.getAddress());
             user.setAge(newUser.getAge());
 
-            return this.userRepository.save(user);
+            // check company
+            if (user.getCompany() != null) {
+                Optional<Company> comOptional = this.companyService.fetchCompanyById(user.getCompany().getId());
+                user.setCompany(comOptional.isPresent() ? comOptional.get() : null);
+            }
 
+            return this.userRepository.save(user);
         }
         return null;
     }
@@ -128,6 +137,16 @@ public class UserService {
             ru.setCreateAt(user.getCreatedAt());
             ru.setUpdatedAt(user.getUpdatedAt());
 
+            if (user.getCompany() != null) {
+                ResUserDTO.Company company = new ResUserDTO.Company();
+                company.setId(user.getCompany().getId());
+                company.setName(user.getCompany().getName());
+
+                ru.setCompany(company);
+            } else {
+                ru.setCompany(null);
+            }
+
             users.add(ru);
         }
         rs.setResult(users);
@@ -154,11 +173,25 @@ public class UserService {
         ru.setAge(user.getAge());
         ru.setCreatedAt(user.getCreatedAt());
 
+        if (user.getCompany() != null) {
+            ResCreateUserDTO.Company company = new ResCreateUserDTO.Company();
+            company.setId(user.getCompany().getId());
+            company.setName(user.getCompany().getName());
+            ru.setCompany(company);
+        }
+
         return ru;
     }
 
     public ResUserDTO convertToResUserDTO(User user) {
         ResUserDTO ru = new ResUserDTO();
+        ResUserDTO.Company company = new ResUserDTO.Company();
+
+        if (user.getCompany() != null) {
+            company.setId(user.getCompany().getId());
+            company.setName(user.getCompany().getName());
+            ru.setCompany(company);
+        }
 
         ru.setId(user.getId());
         ru.setName(user.getName());
@@ -174,6 +207,13 @@ public class UserService {
 
     public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
         ResUpdateUserDTO ru = new ResUpdateUserDTO();
+
+        if (user.getCompany() != null) {
+            ResUpdateUserDTO.Company company = new ResUpdateUserDTO.Company();
+            company.setId(user.getCompany().getId());
+            company.setName(user.getCompany().getName());
+            ru.setCompany(company);
+        }
 
         ru.setId(user.getId());
         ru.setName(user.getName());

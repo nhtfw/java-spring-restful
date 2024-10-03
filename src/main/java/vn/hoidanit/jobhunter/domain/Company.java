@@ -3,6 +3,8 @@ package vn.hoidanit.jobhunter.domain;
 import java.time.Instant;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -54,7 +56,15 @@ public class Company {
 
     private String updatedBy;
 
+    /*
+     * fetch = FetchType.LAZY: Dữ liệu của các đối tượng liên quan (danh sách
+     * User) sẽ chỉ được nạp khi cần thiết, giúp tiết kiệm tài nguyên.
+     */
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    // phía front end khi trả về response sẽ không hiện field này, và khi request
+    // cũng không nhận dữ liệu phía frontend gửi lên
+    // hiểu đơn giản là không convert từ JSON -> java và ngược lại
+    @JsonIgnore
     List<User> users;
 
     // hàm này chạy trước khi tạo đối tượng (persist = write)

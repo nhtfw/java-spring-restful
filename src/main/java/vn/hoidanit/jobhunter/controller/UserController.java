@@ -6,6 +6,7 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.request.ReqUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
@@ -62,17 +63,17 @@ public class UserController {
      * RequestBody
      */
     @ApiMessage("Create a user")
-    public ResponseEntity<ResCreateUserDTO> createUser(@Valid @RequestBody User postmanUser)
+    public ResponseEntity<ResCreateUserDTO> createUser(@Valid @RequestBody User reqUser)
             throws EmailDuplicateException {
 
-        boolean isEmailExist = this.userService.isEmailExist(postmanUser.getEmail());
+        boolean isEmailExist = this.userService.isEmailExist(reqUser.getEmail());
         if (isEmailExist) {
             throw new EmailDuplicateException("Email đã được sử dụng");
         }
 
-        String encodedPassword = passwordEncoder.encode(postmanUser.getPassword());
-        postmanUser.setPassword(encodedPassword);
-        User user = this.userService.handleCreateUser(postmanUser);
+        String encodedPassword = passwordEncoder.encode(reqUser.getPassword());
+        reqUser.setPassword(encodedPassword);
+        User user = this.userService.handleCreateUser(reqUser);
 
         // trả về 1 chuẩn response
         // status : mã (lỗi) phản hồi
@@ -146,7 +147,8 @@ public class UserController {
     // cập nhật / patch cập nhật từng trường, put cập nhật cả object
     @PutMapping("/users")
     @ApiMessage("update a user")
-    public ResponseEntity<ResUpdateUserDTO> putMethodName(@RequestBody User newUser) throws IdInvalidException {
+    public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody ReqUpdateUserDTO newUser)
+            throws IdInvalidException {
 
         User currentUser = this.userService.handleUpdateUser(newUser);
         if (currentUser == null) {

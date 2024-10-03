@@ -34,4 +34,15 @@ public class ResUserDTO {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createAt;
+
+    private Company company;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Company {
+        long id;
+        String name;
+    }
 }

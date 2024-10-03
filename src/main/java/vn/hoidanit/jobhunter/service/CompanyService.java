@@ -10,14 +10,19 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
+import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
+import vn.hoidanit.jobhunter.repository.UserRepository;
 
 @Service
 public class CompanyService {
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public Company handleSaveCompany(Company company) {
         return this.companyRepository.save(company);
@@ -92,6 +97,14 @@ public class CompanyService {
     }
 
     public void handleDeleteCompany(long id) {
+        Optional<Company> cOptional = this.companyRepository.findById(id);
+        if (cOptional.isPresent()) {
+            Company company = cOptional.get();
+
+            // xoa tat ca nguoi dung roi moi xoa company
+            List<User> users = this.userRepository.findByCompany(company);
+            this.userRepository.deleteAll(users);
+        }
         this.companyRepository.deleteById(id);
     }
 
