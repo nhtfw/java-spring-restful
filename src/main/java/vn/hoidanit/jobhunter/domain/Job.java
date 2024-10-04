@@ -57,7 +57,11 @@ public class Job {
     // chỉ bỏ biến jobs bên trong field skills này => ở frontend vẫn nhận được biến
     // skills nhưng thuộc tính jobs thì không
     @JsonIgnoreProperties(value = { "jobs" })
-    // ở đây bảng Job là "người sở hữu"
+    /*
+     * ở đây bảng Job là "người sở hữu" vì có JoinTable, nên khi xóa 1 Job thì sẽ tự
+     * động xóa luôn Job đó ở bảng job_skill, nhưng phía skill là "khách" thì không
+     * có tự động xóa
+     */
     @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private List<Skill> skills;
 
