@@ -67,6 +67,10 @@ public class Company {
     @JsonIgnore
     List<User> users;
 
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    @JsonIgnore
+    List<Job> jobs;
+
     // hàm này chạy trước khi tạo đối tượng (persist = write)
     @PrePersist
     public void handleBeforeCreate() {
