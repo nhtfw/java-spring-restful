@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,6 +38,13 @@ public class CompanyController {
         currentCompany = this.companyService.handleSaveCompany(newCompany);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(currentCompany);
+    }
+
+    @GetMapping("/companies/{id}")
+    @ApiMessage("fetch company by id")
+    public ResponseEntity<Company> fetchCompanyById(@PathVariable("id") long id) {
+        Optional<Company> cOptional = this.companyService.findById(id);
+        return ResponseEntity.ok().body(cOptional.get());
     }
 
     @GetMapping("/companies")

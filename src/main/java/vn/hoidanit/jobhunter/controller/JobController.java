@@ -17,6 +17,7 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1")
 public class JobController {
@@ -33,7 +36,7 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
-    @PostMapping("/skill")
+    @PostMapping("/skills")
     @ApiMessage("create skill")
     public ResponseEntity<Skill> createSkill(@Valid @RequestBody Skill newSkill) throws IdInvalidException {
 
@@ -75,7 +78,7 @@ public class JobController {
         return ResponseEntity.ok().body(null);
     }
 
-    @GetMapping("/skill")
+    @GetMapping("/skills")
     @ApiMessage("fetch all skill")
     public ResponseEntity<ResultPaginationDTO> fetchAllSkills(Pageable pageable,
             @Filter Specification<Skill> spec) {
@@ -98,19 +101,20 @@ public class JobController {
     @ApiMessage("create job")
     public ResponseEntity<ResCreateJobDTO> createJob(@Valid @RequestBody Job newJob) {
 
-        ResCreateJobDTO job = this.jobService.handleCreateJob(newJob);
+        ResCreateJobDTO job = this.jobService.create(newJob);
 
-        return ResponseEntity.ok().body(job);
+        return ResponseEntity.status(HttpStatus.CREATED).body(job);
     }
 
     @PutMapping("/job")
     @ApiMessage("update job")
-    public ResponseEntity<ResUpdateJobDTO> updateJob(@Valid @RequestBody Job newJob) throws IdInvalidException {
-        if (!this.jobService.fetchJobById(newJob.getId()).isPresent()) {
+    public ResponseEntity<ResUpdateJobDTO> updateJob(@Valid @RequestBody Job job) throws IdInvalidException {
+        Optional<Job> currentJob = this.jobService.fetchJobById(job.getId());
+        if (!currentJob.isPresent()) {
             throw new IdInvalidException("Job không tồn tại");
         }
 
-        ResUpdateJobDTO res = this.jobService.handleUpdateJob(newJob);
+        ResUpdateJobDTO res = this.jobService.update(job, currentJob.get());
 
         return ResponseEntity.ok().body(res);
     }
@@ -137,7 +141,7 @@ public class JobController {
         return ResponseEntity.ok().body(job);
     }
 
-    @GetMapping("/job")
+    @GetMapping("/jobs")
     public ResponseEntity<ResultPaginationDTO> fetchAllJobs(@Filter Specification<Job> spec, Pageable pageable) {
 
         ResultPaginationDTO res = this.jobService.fetchAllJobs(spec, pageable);
