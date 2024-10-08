@@ -2,6 +2,8 @@ package vn.hoidanit.jobhunter.domain;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,12 +36,6 @@ public class Resume {
     @Enumerated(EnumType.STRING)
     private ResumeStateEnum status;
 
-    private Instant createdAt;
-    private Instant updatedAt;
-
-    private String createdBy;
-    private String updatedBy;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -47,6 +43,12 @@ public class Resume {
     @ManyToOne
     @JoinColumn(name = "job_id")
     private Job job;
+
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    private String createdBy;
+    private String updatedBy;
 
     @PrePersist
     public void handleBeforeCreate() {
