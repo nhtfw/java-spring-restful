@@ -97,7 +97,7 @@ public class JobController {
         return ResponseEntity.ok().body(skill);
     }
 
-    @PostMapping("/job")
+    @PostMapping("/jobs")
     @ApiMessage("create job")
     public ResponseEntity<ResCreateJobDTO> createJob(@Valid @RequestBody Job newJob) {
 
@@ -106,7 +106,7 @@ public class JobController {
         return ResponseEntity.status(HttpStatus.CREATED).body(job);
     }
 
-    @PutMapping("/job")
+    @PutMapping("/jobs")
     @ApiMessage("update job")
     public ResponseEntity<ResUpdateJobDTO> updateJob(@Valid @RequestBody Job job) throws IdInvalidException {
         Optional<Job> currentJob = this.jobService.fetchJobById(job.getId());
@@ -119,7 +119,7 @@ public class JobController {
         return ResponseEntity.ok().body(res);
     }
 
-    @DeleteMapping("/job/{id}")
+    @DeleteMapping("/jobs/{id}")
     @ApiMessage("delete job")
     public ResponseEntity<Void> deleteJob(@PathVariable long id) throws IdInvalidException {
         if (!this.jobService.fetchJobById(id).isPresent()) {
@@ -131,7 +131,7 @@ public class JobController {
         return ResponseEntity.ok().body(null);
     }
 
-    @GetMapping("/job/{id}")
+    @GetMapping("/jobs/{id}")
     public ResponseEntity<Job> fetchJob(@PathVariable long id) throws IdInvalidException {
         if (!this.jobService.fetchJobById(id).isPresent()) {
             throw new IdInvalidException("Job không tồn tại");

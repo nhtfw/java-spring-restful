@@ -46,7 +46,7 @@ public class ResumeController {
     @Autowired
     private ResumeService resumeService;
 
-    @PostMapping("/resume")
+    @PostMapping("/resumes")
     @ApiMessage("Create Resume")
     public ResponseEntity<ResCreateResumeDTO> createResume(@Valid @RequestBody Resume resume)
             throws IdInvalidException {
@@ -88,7 +88,7 @@ public class ResumeController {
         return ResponseEntity.ok().body(null);
     }
 
-    @GetMapping("/resume/{id}")
+    @GetMapping("/resumes/{id}")
     @ApiMessage("Fetch Resume")
     public ResponseEntity<ResFetchResumeDTO> fetchResume(@PathVariable long id) throws IdInvalidException {
 
@@ -101,7 +101,7 @@ public class ResumeController {
         return ResponseEntity.ok().body(res);
     }
 
-    @GetMapping("/resume")
+    @GetMapping("/resumes")
     public ResponseEntity<ResultPaginationDTO> fetchAllResume(@Filter Specification<Resume> spec, Pageable pageable) {
 
         ResultPaginationDTO res = this.resumeService.fetchAllResume(spec, pageable);
