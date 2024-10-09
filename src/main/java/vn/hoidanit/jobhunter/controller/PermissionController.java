@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -73,7 +72,11 @@ public class PermissionController {
 
     @DeleteMapping("/permissions/{id}")
     @ApiMessage("delete Permissions")
-    public ResponseEntity<Void> deletePermissions(@PathVariable long id) {
+    public ResponseEntity<Void> deletePermissions(@PathVariable long id) throws IdInvalidException {
+
+        if (!this.permissionService.existById(id)) {
+            throw new IdInvalidException("Id không tồn tại");
+        }
 
         this.permissionService.deleteById(id);
 

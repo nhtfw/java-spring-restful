@@ -38,7 +38,6 @@ public class PermissionService {
         if (op.isPresent()) {
             Permission p = op.get();
 
-            p.setId(permission.getId());
             p.setName(permission.getName());
             p.setApiPath(permission.getApiPath());
             p.setMethod(permission.getMethod());
@@ -55,13 +54,14 @@ public class PermissionService {
 
         ResultPaginationDTO res = new ResultPaginationDTO();
         ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+
         meta.setPage(pageable.getPageNumber() + 1);
         meta.setPageSize(pageable.getPageSize());
         meta.setPages(page.getTotalPages());
         meta.setTotal(page.getTotalElements());
 
         res.setMeta(meta);
-        res.setResult(page.get());
+        res.setResult(page.getContent());
 
         return res;
     }
@@ -76,6 +76,7 @@ public class PermissionService {
             // của pt đó có chứa permission hiện tại
             permission.getRoles().forEach(role -> role.getPermissions().remove(permission));
 
+            // delete permissions
             this.permissionsRepository.delete(permission);
         }
     }

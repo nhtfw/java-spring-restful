@@ -54,12 +54,13 @@ public class RoleService {
                         .collect(Collectors.toList());
 
                 List<Permission> dbPermissions = this.permissionsRepository.findByIdIn(reqPermissions);
-                currentRole.setPermissions(dbPermissions);
+                role.setPermissions(dbPermissions);
             }
 
             currentRole.setName(role.getName());
             currentRole.setDescription(role.getDescription());
             currentRole.setActive(role.isActive());
+            currentRole.setPermissions(role.getPermissions());
 
             return this.roleRepository.save(currentRole);
         }
