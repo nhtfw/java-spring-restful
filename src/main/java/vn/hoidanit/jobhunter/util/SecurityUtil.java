@@ -92,7 +92,12 @@ public class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    public String createAccessToken(String email, ResLoginDTO.UserLogin dto) {
+    public String createAccessToken(String email, ResLoginDTO dto) {
+        ResLoginDTO.UserInsideToken userToken = new ResLoginDTO.UserInsideToken();
+        userToken.setId(dto.getUser().getId());
+        userToken.setEmail(dto.getUser().getEmail());
+        userToken.setName(dto.getUser().getName());
+
         // mốc thời gian hiện tại + thời hạn hết hạn của token
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
@@ -116,7 +121,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", dto)
+                .claim("user", userToken)
                 // thêm 1 claim có tên permisson
                 .claim("permission", listAuthority)
                 .build();
@@ -142,7 +147,12 @@ public class SecurityUtil {
      * Việc sử dụng cả Access Token và Refresh Token giúp cân bằng giữa bảo mật và
      * trải nghiệm người dùng.
      */
-    public String createRefreshToken(String email, ResLoginDTO res) {
+    public String createRefreshToken(String email, ResLoginDTO dto) {
+        ResLoginDTO.UserInsideToken userToken = new ResLoginDTO.UserInsideToken();
+        userToken.setId(dto.getUser().getId());
+        userToken.setEmail(dto.getUser().getEmail());
+        userToken.setName(dto.getUser().getName());
+
         // mốc thời gian hiện tại + thời hạn hết hạn của token
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
@@ -152,7 +162,7 @@ public class SecurityUtil {
                 .expiresAt(validity)
                 .subject(email)
                 //
-                .claim("user", res.getUser())
+                .claim("user", userToken)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

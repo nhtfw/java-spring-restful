@@ -37,11 +37,22 @@ public class ResUserDTO {
 
     private Company company;
 
+    private Role role;
+
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Company {
+        long id;
+        String name;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Role {
         long id;
         String name;
     }

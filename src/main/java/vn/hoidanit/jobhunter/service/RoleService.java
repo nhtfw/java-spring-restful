@@ -93,4 +93,12 @@ public class RoleService {
         this.roleRepository.deleteById(id);
     }
 
+    public Role fetchById(long id) {
+        Optional<Role> rOptional = this.roleRepository.findById(id);
+        if (rOptional.isPresent()) {
+            return rOptional.get();
+        }
+        return null;
+    }
+
 }

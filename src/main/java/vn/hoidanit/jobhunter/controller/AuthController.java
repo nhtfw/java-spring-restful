@@ -74,15 +74,18 @@ public class AuthController {
                 ResLoginDTO res = new ResLoginDTO();
 
                 User currentUSer = this.userService.handleGetUserByUsername(loginDTO.getUsername());
-                ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
-                                currentUSer.getId(),
-                                currentUSer.getEmail(),
-                                currentUSer.getName());
-                res.setUser(userLogin);
+                if (currentUSer != null) {
+                        ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
+                                        currentUSer.getId(),
+                                        currentUSer.getEmail(),
+                                        currentUSer.getName(),
+                                        currentUSer.getRole());
+                        res.setUser(userLogin);
+                }
 
                 // create a token
                 // truyền vào thông tin đăng nhập của người dùng để lấy token
-                String accessToken = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
+                String accessToken = this.securityUtil.createAccessToken(authentication.getName(), res);
                 res.setAccessToken(accessToken);
 
                 // create refresh token and update
@@ -137,6 +140,7 @@ public class AuthController {
                         userLogin.setId(user.getId());
                         userLogin.setEmail(user.getEmail());
                         userLogin.setName(user.getName());
+                        userLogin.setRole(user.getRole());
 
                         userGetAccount.setUser(userLogin);
                 }
@@ -173,12 +177,13 @@ public class AuthController {
                 ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
                                 currentUSer.getId(),
                                 currentUSer.getEmail(),
-                                currentUSer.getName());
+                                currentUSer.getName(),
+                                currentUSer.getRole());
                 res.setUser(userLogin);
 
                 // create a token
                 // truyền vào thông tin đăng nhập của người dùng để lấy token
-                String accessToken = this.securityUtil.createAccessToken(email, res.getUser());
+                String accessToken = this.securityUtil.createAccessToken(email, res);
                 res.setAccessToken(accessToken);
 
                 // create refresh token and update

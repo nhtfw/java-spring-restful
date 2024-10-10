@@ -80,6 +80,10 @@ public class User {
     @JsonIgnore
     List<Resume> resumes;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
     // hàm này chạy trước khi tạo đối tượng (persist = write)
     @PrePersist
     public void handleBeforeCreate() {
