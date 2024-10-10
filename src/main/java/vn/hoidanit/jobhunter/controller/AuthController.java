@@ -206,7 +206,7 @@ public class AuthController {
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(res);
         }
 
-        @GetMapping("/auth/logout")
+        @PostMapping("/auth/logout")
         @ApiMessage("Logout user")
         public ResponseEntity<Void> logOut() {
 
