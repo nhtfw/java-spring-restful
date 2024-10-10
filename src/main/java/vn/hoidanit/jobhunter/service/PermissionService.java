@@ -80,4 +80,14 @@ public class PermissionService {
             this.permissionsRepository.delete(permission);
         }
     }
+
+    public boolean isSameName(Permission permission) {
+        Optional<Permission> pOptional = this.permissionsRepository.findById(permission.getId());
+        if (pOptional.isPresent()) {
+            if (pOptional.get().getName().equals(permission.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
