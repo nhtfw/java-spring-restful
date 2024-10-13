@@ -24,6 +24,7 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
         return true;
     }
 
+    // config kết quả trả về
     @Override
     // body là dữ liệu trả về
     public Object beforeBodyWrite(Object body,

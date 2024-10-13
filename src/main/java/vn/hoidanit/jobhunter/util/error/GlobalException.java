@@ -123,4 +123,15 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
+    @ExceptionHandler(PermissionException.class)
+    public ResponseEntity<RestResponse<Object>> permissionException(PermissionException ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError("Forbidden");
+        res.setError(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
 }
