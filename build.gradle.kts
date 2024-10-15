@@ -38,6 +38,9 @@ dependencies {
 
     // specification
 	implementation("com.turkraft.springfilter:jpa:3.1.7")
+
+	// email
+	implementation("org.springframework.boot:spring-boot-starter-mail") 
 }
 
 tasks.withType<Test> {
