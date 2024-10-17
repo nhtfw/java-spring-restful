@@ -6,14 +6,19 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import vn.hoidanit.jobhunter.domain.Job;
+import vn.hoidanit.jobhunter.repository.JobRepository;
 
 import java.nio.charset.StandardCharsets;
+
+import java.util.List;
 
 @Service
 public class EmailService {
@@ -26,6 +31,9 @@ public class EmailService {
 
     @Autowired
     private SpringTemplateEngine springTemplateEngine;
+
+    @Autowired
+    private JobRepository jobRepository;
 
     public void sendSimpleEmail() {
 
@@ -60,8 +68,27 @@ public class EmailService {
         }
     }
 
-    public void sendEmailFromTemplateSync(String to, String subject, String templateName) {
+    /*
+     * Điều này có nghĩa là khi một phương thức được đánh dấu bằng @Async được gọi,
+     * nó sẽ được thực thi trong một luồng (thread) riêng biệt, không chặn luồng
+     * chính. Điều này giúp cải thiện hiệu suất ứng dụng, đặc biệt trong các tác vụ
+     * tốn thời gian như gọi dịch vụ bên ngoài, xử lý tệp lớn, hoặc các tác vụ nền.
+     */
+    @Async
+    public void sendEmailFromTemplateSync(
+            String to,
+            String subject,
+            String templateName,
+            String username,
+            // không quy định nhất thiết phải là 1 kiểu dữ liệu
+            Object value) {
+
         Context context = new Context();
+
+        // tạo biến
+        context.setVariable("name", username);
+        context.setVariable("jobs", value);
+
         // TemplateEngine convert từ file html -> text
         // đầu vào là file html. đầu ra là string
         String content = this.springTemplateEngine.process(templateName, context);
