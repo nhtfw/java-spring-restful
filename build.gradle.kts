@@ -41,6 +41,10 @@ dependencies {
 
 	// email
 	implementation("org.springframework.boot:spring-boot-starter-mail") 
+
+	// swagger, , là tìm cách viết document (tài liệu) cho REST APIs.
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+
 }
 
 tasks.withType<Test> {
