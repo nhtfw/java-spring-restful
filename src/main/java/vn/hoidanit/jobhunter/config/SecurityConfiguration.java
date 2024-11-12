@@ -93,9 +93,15 @@ public class SecurityConfiguration {
     // lấy data của jwt nạp vào authentication, lưu authentication vào spring
     // security context
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        /*
+         * Tạo một JwtGrantedAuthoritiesConverter để chuyển đổi các quyền (authorities)
+         * từ các claim trong JWT thành một danh sách các quyền mà Spring Security hiểu.
+         */
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
+        // Đặt prefix (tiền tố) cho các quyền truy cập được lấy từ JWT
         grantedAuthoritiesConverter.setAuthorityPrefix("");
+
         // ứng với claim có tên permission, nạp tất cả data của claim đó nạp vào
         // authentication
         /*

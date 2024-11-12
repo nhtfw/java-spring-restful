@@ -170,7 +170,7 @@ public class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    // hàm lấy key, key được lấy từ file môi trường (applications.property)
+    // hàm lấy key, key được lấy từ file môi trường (applications.properties)
     private SecretKey getSecretKey() {
         /*
          * jwtKey là một chuỗi đã mã hóa Base64. Phương thức này dùng để giải mã chuỗi
