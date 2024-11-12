@@ -36,7 +36,7 @@ public class Skill {
     private String createdBy;
     private String updatedBy;
 
-    // ánh xạ tới field/biến skills của Job
+    // ánh xạ tới field/biến skills của Job(chủ)
     @ManyToMany(mappedBy = "skills", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Job> jobs;

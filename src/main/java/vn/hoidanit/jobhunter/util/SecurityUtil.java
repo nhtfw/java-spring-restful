@@ -217,7 +217,7 @@ public class SecurityUtil {
          * extractPrincipal, Phương thức này (giả định) trích xuất thông tin Principal
          * từ Authentication. Principal thường là username hoặc email của người dùng,
          * tùy thuộc vào cấu hình.
-         * 
+         *
          * Hàm này chỉ trả về username hoặc email thay vì trả về toàn bộ Authentication
          * để tránh lộ thông tin nhạy cảm như mật khẩu hoặc chi tiết bảo mật không cần
          * thiết khác.

@@ -59,15 +59,15 @@ public class AuthController {
 
                 // xác thực người dùng => cần viết hàm loadUserByUsername
                 /*
-                 * 
+                 *
                  * Dòng này thực hiện việc xác thực thông qua authenticationManagerBuilder.
                  * authenticationManagerBuilder sẽ kiểm tra thông tin đăng nhập và gọi đến
                  * UserDetailsService (hoặc loadUserByUsername()) để nạp thông tin người dùng từ
                  * database.
-                 * 
+                 *
                  * Nếu thông tin là hợp lệ, quá trình xác thực thành công và một đối tượng
                  * Authentication chứa thông tin xác thực sẽ được trả về.
-                 * 
+                 *
                  */
                 Authentication authentication = authenticationManagerBuilder.getObject()
                                 .authenticate(authenticationToken);
@@ -165,8 +165,8 @@ public class AuthController {
 
                 // check valid refresh_token, nếu không có lỗi trả về JWT
                 Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refresh_token);
-                // lấy ra subject đã được thêm trước đó khi tạo jwt, dùng để định danh người
-                // dùng
+                // lấy ra subject(email) đã được thêm trước đó khi tạo jwt, dùng để định danh
+                // người dùng
                 String email = decodedToken.getSubject();
 
                 // check user bằng token và email
