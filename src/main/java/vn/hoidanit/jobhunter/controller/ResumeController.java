@@ -68,7 +68,7 @@ public class ResumeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
-    @PutMapping("/resume")
+    @PutMapping("/resumes")
     @ApiMessage("Update Resume")
     public ResponseEntity<ResUpdateResumeDTO> updateResume(@RequestBody Resume resume)
             throws IdInvalidException {
@@ -82,7 +82,7 @@ public class ResumeController {
         return ResponseEntity.ok().body(res);
     }
 
-    @DeleteMapping("/resume/{id}")
+    @DeleteMapping("/resumes/{id}")
     @ApiMessage("Delete Resume")
     public ResponseEntity<Void> deleteResume(@PathVariable long id) throws IdInvalidException {
         if (this.resumeService.fetchResumeByID(id) == null) {

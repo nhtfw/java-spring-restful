@@ -48,7 +48,7 @@ public class JobController {
         return ResponseEntity.ok().body(skill);
     }
 
-    @PutMapping("/skill")
+    @PutMapping("/skills")
     @ApiMessage("update skill")
     public ResponseEntity<Skill> updateSkill(@Valid @RequestBody Skill newSkill) throws IdInvalidException {
 
@@ -65,7 +65,7 @@ public class JobController {
         return ResponseEntity.ok().body(skill);
     }
 
-    @DeleteMapping("/skill/{id}")
+    @DeleteMapping("/skills/{id}")
     @ApiMessage("Delete skill")
     public ResponseEntity<Void> deleteSkill(@PathVariable long id) throws IdInvalidException {
 
@@ -88,7 +88,7 @@ public class JobController {
         return ResponseEntity.ok().body(res);
     }
 
-    @GetMapping("/skill/{id}")
+    @GetMapping("/skills/{id}")
     @ApiMessage("fetch skill")
     public ResponseEntity<Skill> fetchSkill(@PathVariable long id) {
 
