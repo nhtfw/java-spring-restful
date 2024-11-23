@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Optional;
 
-/* Khi một yêu cầu không có token hoặc token không hợp lệ, 
+/* Khi một yêu cầu không có token hoặc token không hợp lệ,
 Spring sẽ gọi AuthenticationEntryPoint để xử lý phản hồi cho client */
 //handle lỗi 401, truyền sai token
 @Component
